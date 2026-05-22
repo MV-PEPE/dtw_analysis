@@ -19,17 +19,17 @@ import pandas as pd  # for reading and manipulating the CSV metadata
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
-HDF5_INPUT        = "your_data.h5"                                    # path to the original HDF5 file
-HDF5_OUTPUT       = "your_data_trimmed.h5"                            # path where the trimmed HDF5 will be saved
-CSV_INPUT         = "data100_neg1000_peak_and_steps_forDTW.csv"       # path to the original event metadata CSV
-CSV_OUTPUT        = "data100_neg1000_peak_and_steps_forDTW_trimmed.csv"  # path where the updated CSV will be saved
-HDF5_GROUP        = "events"                                           # HDF5 group that contains the event datasets
+HDF5_INPUT        = "./data/data100_neg1000_peak_and_steps_forDTW.h5"                  # path to the original HDF5 file
+HDF5_OUTPUT       = "./data_trimmed/data100_neg1000_peak_and_steps_forDTW_trimmed.h5"  # path where the trimmed HDF5 will be saved
+CSV_INPUT         = "./data/data100_neg1000_peak_and_steps_forDTW.csv"                 # path to the original event metadata CSV
+CSV_OUTPUT        = "./data_trimmed/data100_neg1000_peak_and_steps_forDTW_trimmed.csv" # path where the updated CSV will be saved
+HDF5_GROUP        = "events"                                                           # HDF5 group that contains the event datasets
 SAMPLING_RATE_KHZ = 50  # acquisition sampling rate in kHz (50 kHz = 50 samples per ms)
 
 # ── Load metadata ─────────────────────────────────────────────────────────────
 
 meta = pd.read_csv(CSV_INPUT, index_col="event_name")  # load CSV with event_name as the row index
-print(f"Loaded {len(meta)} events from CSV.")           # confirm how many events were found
+print(f"Loaded {len(meta)} events from CSV.")          # confirm how many events were found
 
 # ── Trim and save ─────────────────────────────────────────────────────────────
 
