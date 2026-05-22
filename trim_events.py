@@ -54,7 +54,7 @@ with h5py.File(HDF5_INPUT, "r") as f_in, h5py.File(HDF5_OUTPUT, "w") as f_out:  
         dwell_samples = int(round(row["dwell_time_ms"] * SAMPLING_RATE_KHZ))  # convert dwell time from ms to samples (ms × 50 = samples)
 
         buf_before = int(round(dwell_samples / 3))  # buffer before event: one third of the dwell time in samples
-        buf_after  = dwell_samples                  # buffer after event: full dwell time in samples
+        buf_after  = min(dwell_samples, 100)        # buffer after event: full dwell time in samples
 
         start = int(row["start"])  # event start index in samples (from CSV)
         end   = int(row["end"])    # event end index in samples (from CSV)
@@ -63,6 +63,10 @@ with h5py.File(HDF5_INPUT, "r") as f_in, h5py.File(HDF5_OUTPUT, "w") as f_out:  
         trim_end   = min(len(trace), end + buf_after)  # end of trimmed trace, clamped to trace length so it never overflows
 
         trimmed = trace[trim_start:trim_end]  # slice the trace to the buffered event window
+        
+        pre_event = trace[trim_start : start]    # slice out the pre-event buffer region
+        skip      = max(1, len(pre_event) // 5)  # skip first ~20% of buffer to avoid transients
+        baseline  = pre_event[skip:].mean()      # compute mean of the remaining pre-event samples as baseline
 
         ds = grp_out.create_dataset(event_name, data=trimmed)  # save the trimmed trace as a new dataset in the output HDF5
         for key, val in grp_in[event_name].attrs.items():      # iterate over all attributes of the original dataset
