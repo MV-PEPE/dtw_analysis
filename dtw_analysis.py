@@ -35,9 +35,8 @@ common_keys = [k for k in signals if k in meta.index]
 mean_dwell = meta.loc[common_keys, "dwell_time_ms"].mean()
 ref_key    = (meta.loc[common_keys, "dwell_time_ms"] - mean_dwell).abs().idxmin()  # pick event closest to mean dwell time
 
-ref_signal   = signals[ref_key] - meta.at[ref_key, "baseline_nA"]
+ref_signal = (signals[ref_key] - meta.at[ref_key, "baseline_nA"]) / meta.at[ref_key, "delta_I_baseline_nA"]  # baseline-subtract and normalise reference amplitude
 ref_dwell    = meta.loc[ref_key, "dwell_time_ms"]
-# ref_time     = np.linspace(0, ref_dwell, DOWNSAMPLE_TO)
 ref_trim_len  = meta.at[ref_key, "end"] - meta.at[ref_key, "start"]  # full trimmed trace length in samples (from updated start/end in CSV)
 ref_total_ms  = ref_trim_len / SAMPLING_RATE_KHZ                      # convert full trimmed length to milliseconds
 ref_time      = np.linspace(0, ref_total_ms, DOWNSAMPLE_TO)           # time axis covering the full trimmed trace including buffers
@@ -48,7 +47,7 @@ print(f"Reference: {ref_key} ({ref_dwell:.1f} ms) — aligning {len(common_keys)
 aligned = []
 for i, key in enumerate(common_keys):
 
-    sig = signals[key] - meta.at[key, "baseline_nA"]  # baseline normalization
+    sig = (signals[key] - meta.at[key, "baseline_nA"]) / meta.at[key, "delta_I_baseline_nA"]  # baseline-subtract and normalise amplitude so peak dip = -1
 
     path        = dtw.warping_path(ref_signal, sig)
     ref_idx     = np.array([p[0] for p in path])
@@ -81,7 +80,7 @@ ax.plot(time_aligned, ref_signal, color="black", linewidth=1, linestyle="--", la
 
 ax.axvline(0, color="gray", linestyle=":", linewidth=0.8)
 ax.set_xlabel("Time (ms)")
-ax.set_ylabel("Current relative to baseline")
+ax.set_ylabel("Normalised current (peak dip = -1)")
 ax.set_title("DTW-Aligned Event Overlays")
 ax.legend(loc="lower right")
 plt.tight_layout()
