@@ -67,6 +67,8 @@ with h5py.File(HDF5_INPUT, "r") as f_in, h5py.File(HDF5_OUTPUT, "w") as f_out:  
         pre_event = trace[trim_start : start]    # slice out the pre-event buffer region
         skip      = max(1, len(pre_event) // 5)  # skip first ~20% of buffer to avoid transients
         baseline  = pre_event[skip:].mean()      # compute mean of the remaining pre-event samples as baseline
+        event_trace = trace[start:end]                                    # slice out just the event portion (no buffers)
+        meta.at[event_name, "delta_I_baseline_nA"] = baseline - event_trace.min()  # max current drop relative to computed baseline
 
         ds = grp_out.create_dataset(event_name, data=trimmed)  # save the trimmed trace as a new dataset in the output HDF5
         for key, val in grp_in[event_name].attrs.items():      # iterate over all attributes of the original dataset
