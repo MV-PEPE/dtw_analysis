@@ -8,6 +8,7 @@ H5_PATH  = "./data_trimmed/data100_neg1000_peak_and_steps_forDTW_trimmed.h5"
 CSV_PATH = "./data_trimmed/data100_neg1000_peak_and_steps_forDTW_trimmed.csv"
 
 DOWNSAMPLE_TO = 500  # samples per event (increase later if needed)
+SAMPLING_RATE_KHZ = 50
 
 # ── 1. Load & downsample signals ───────────────────────────────────────────────
 signals = {}
@@ -34,7 +35,10 @@ common_keys = [k for k in signals if k in meta.index]
 ref_key      = "event_00517"
 ref_signal   = signals[ref_key] - meta.at[ref_key, "baseline_nA"]
 ref_dwell    = meta.loc[ref_key, "dwell_time_ms"]
-ref_time     = np.linspace(0, ref_dwell, DOWNSAMPLE_TO)
+# ref_time     = np.linspace(0, ref_dwell, DOWNSAMPLE_TO)
+ref_trim_len  = meta.at[ref_key, "end"] - meta.at[ref_key, "start"]  # full trimmed trace length in samples (from updated start/end in CSV)
+ref_total_ms  = ref_trim_len / SAMPLING_RATE_KHZ                      # convert full trimmed length to milliseconds
+ref_time      = np.linspace(0, ref_total_ms, DOWNSAMPLE_TO)           # time axis covering the full trimmed trace including buffers
 
 print(f"Reference: {ref_key} ({ref_dwell:.1f} ms) — aligning {len(common_keys)} events...")
 
