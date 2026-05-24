@@ -36,7 +36,7 @@ print(f"Loaded {len(meta)} events from CSV.")          # confirm how many events
 skipped = []  # keep track of events that are missing from the HDF5 file
 
 with h5py.File(HDF5_INPUT, "r") as f_in, h5py.File(HDF5_OUTPUT, "w") as f_out:  # open input HDF5 for reading, output for writing
-    grp_in  = f_in[HDF5_GROUP]               # access the group containing raw event traces in the input file
+    grp_in  = f_in[HDF5_GROUP]                # access the group containing raw event traces in the input file
     grp_out = f_out.create_group(HDF5_GROUP)  # create the same group structure in the output file
 
     for key, val in f_in.attrs.items():  # iterate over all root-level attributes of the input file (e.g. sampling rate)
@@ -45,11 +45,12 @@ with h5py.File(HDF5_INPUT, "r") as f_in, h5py.File(HDF5_OUTPUT, "w") as f_out:  
     for event_name, row in meta.iterrows():  # loop over each event row in the CSV metadata
 
         if event_name not in grp_in:                                             # check if this event exists in the HDF5 file
-            print(f"  Warning: '{event_name}' not found in HDF5 — skipping.")   # warn if it is missing
+            print(f"  Warning: '{event_name}' not found in HDF5 — skipping.")    # warn if it is missing
             skipped.append(event_name)                                           # record the missing event name
             continue                                                             # skip to the next event
 
         trace = np.array(grp_in[event_name], dtype=np.float64)  # load the full raw current trace as a float64 array
+        trace = trace * 2  # recover real current: recorded current is 0.5 * real current
 
         dwell_samples = int(round(row["dwell_time_ms"] * SAMPLING_RATE_KHZ))  # convert dwell time from ms to samples (ms × 50 = samples)
 
@@ -59,7 +60,7 @@ with h5py.File(HDF5_INPUT, "r") as f_in, h5py.File(HDF5_OUTPUT, "w") as f_out:  
         start = int(row["start"])  # event start index in samples (from CSV)
         end   = int(row["end"])    # event end index in samples (from CSV)
 
-        trim_start = max(0, start - buf_before)       # start of trimmed trace, clamped to 0 so it never goes negative
+        trim_start = max(0, start - buf_before)        # start of trimmed trace, clamped to 0 so it never goes negative
         trim_end   = min(len(trace), end + buf_after)  # end of trimmed trace, clamped to trace length so it never overflows
 
         trimmed = trace[trim_start:trim_end]  # slice the trace to the buffered event window
@@ -67,15 +68,15 @@ with h5py.File(HDF5_INPUT, "r") as f_in, h5py.File(HDF5_OUTPUT, "w") as f_out:  
         pre_event = trace[trim_start : start]    # slice out the pre-event buffer region
         skip      = max(1, len(pre_event) // 5)  # skip first ~20% of buffer to avoid transients
         baseline  = pre_event[skip:].mean()      # compute mean of the remaining pre-event samples as baseline
-        event_trace = trace[start:end]                                    # slice out just the event portion (no buffers)
+        event_trace = trace[start:end]           # slice out just the event portion (no buffers)
         meta.at[event_name, "delta_I_baseline_nA"] = baseline - event_trace.min()  # max current drop relative to computed baseline
 
         ds = grp_out.create_dataset(event_name, data=trimmed)  # save the trimmed trace as a new dataset in the output HDF5
         for key, val in grp_in[event_name].attrs.items():      # iterate over all attributes of the original dataset
-            ds.attrs[key] = val                                 # copy each attribute to the new dataset to preserve per-event metadata
+            ds.attrs[key] = val                                # copy each attribute to the new dataset to preserve per-event metadata
 
-        meta.at[event_name, "start"] = trim_start  # overwrite start with the buffered trim start
-        meta.at[event_name, "end"]   = trim_end    # overwrite end with the buffered trim end
+        meta.at[event_name, "start"] = trim_start      # overwrite start with the buffered trim start
+        meta.at[event_name, "end"]   = trim_end        # overwrite end with the buffered trim end
         meta.at[event_name, "baseline_nA"] = baseline  # save the computed baseline current value to metadata
 
 print(f"\nDone. {len(meta) - len(skipped)} events trimmed.")  # report how many events were successfully processed
