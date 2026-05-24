@@ -31,8 +31,10 @@ meta = pd.read_csv(CSV_PATH).set_index("event_name")
 
 # ── 4. Pick reference event ─────────────────────────────────────────────────────
 common_keys = [k for k in signals if k in meta.index]
-# median_dwell = meta.loc[common_keys, "dwell_time_ms"].mean() # Pick a reference event base on mean time
-ref_key      = "event_00517"
+# ref_key      = "event_00176"
+mean_dwell = meta.loc[common_keys, "dwell_time_ms"].mean()
+ref_key    = (meta.loc[common_keys, "dwell_time_ms"] - mean_dwell).abs().idxmin()  # pick event closest to mean dwell time
+
 ref_signal   = signals[ref_key] - meta.at[ref_key, "baseline_nA"]
 ref_dwell    = meta.loc[ref_key, "dwell_time_ms"]
 # ref_time     = np.linspace(0, ref_dwell, DOWNSAMPLE_TO)
