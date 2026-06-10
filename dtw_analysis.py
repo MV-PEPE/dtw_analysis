@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 H5_PATH  = "./data_trimmed/data302-0.5gain_doublepeak_forDTW_trimmed.h5"
 CSV_PATH = "./data_trimmed/data302-0.5gain_doublepeak_forDTW_trimmed.csv"
 
-DOWNSAMPLE_TO = 1500  # samples per event (increase later if needed)
+DOWNSAMPLE_TO = 500  # samples per event (increase later if needed)
 
 # Use for no downsampling
 # with h5py.File(H5_PATH, "r") as f:
@@ -94,6 +94,6 @@ ax.set_ylabel("Normalised current (peak dip = -1)")
 ax.set_title("DTW-Aligned Event Overlays")
 ax.legend(loc="lower right")
 plt.tight_layout()
-plt.savefig("dtw_aligned_overlay.png", dpi=150)
+plt.savefig("plots/dtw_aligned_overlay.png", dpi=150)
 plt.show()
-print("Saved: dtw_aligned_overlay.png")
+print("Saved: plots/dtw_aligned_overlay.png")
