@@ -11,12 +11,13 @@ Requirements:
 
 import h5py   # for reading and writing HDF5 files
 import numpy as np  # for numerical array operations
+import pandas as pd # for reading and writing CSV files
 from pathlib import Path  # for navigating the folder structure
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 INPUT_DIR  = Path("./data/data_for_plots/data_with_halfed_current")    # root folder containing subfolders with HDF5 files
-OUTPUT_DIR = Path("./data/data_for_plots/data_with_real_current")  # root folder where corrected files will be saved
+OUTPUT_DIR = Path("./data/data_for_plots/data_with_recovered_current")  # root folder where corrected files will be saved
 HDF5_GROUP = "events"                            # HDF5 group containing the event datasets
 
 # ── Recover real current and save ─────────────────────────────────────────────
@@ -45,8 +46,11 @@ for h5_path in INPUT_DIR.rglob("*.h5"):                                    # rec
     csv_path = h5_path.with_suffix(".csv")                                      # find the matching CSV file
     if csv_path.exists():                                                        # check if it exists
         out_csv = OUTPUT_DIR / csv_path.relative_to(INPUT_DIR)                  # mirror path in output folder
-        import shutil                                                            # for copying files
-        shutil.copy2(csv_path, out_csv)                                         # copy CSV unchanged to output folder
-        print(f"Copied CSV → {out_csv}")                                        # confirm CSV was copied
+
+        csv = pd.read_csv(csv_path)                          # load the CSV file
+        csv["area_nA_ms"]  = csv["area_nA_ms"]  * 2         # recover real current: correct area column
+        csv["delta_I_nA"]  = csv["delta_I_nA"]  * 2         # recover real current: correct delta_I column
+        csv.to_csv(out_csv, index=False)                     # save corrected CSV to output folder
+        print(f"Saved corrected CSV → {out_csv}")            # confirm CSV was saved
 
 print(f"\nDone! Corrected data saved to {OUTPUT_DIR}")  # confirm completion
