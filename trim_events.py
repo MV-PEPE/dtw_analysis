@@ -7,7 +7,7 @@ trimmed traces to a new HDF5 file and an updated CSV.
 
 Buffer sizes (in samples, at 50 kHz):
     before = dwell_time_samples / 3
-    after  = dwell_time_samples
+    after  = dwell_time_samples * 2
 
 Requirements:
     pip install h5py numpy pandas
