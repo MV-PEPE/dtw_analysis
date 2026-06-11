@@ -33,26 +33,20 @@ DATA_DIRS = [
     Path("data/data_for_plots/data_with_recovered_current"),  # directory with recovered current data
 ]
 
-PLOT_MODE  = "overlaid_bars"   # see docstring above for options
+PLOT_MODE  = "overlaid_kde_density"   # see docstring above for options
 BIN_WIDTH  = 5                 # bin width for bar histograms (in x-axis units)
 KDE_POINTS = 500               # number of points to evaluate KDE curve at
 
 GROUPS = {
-    "aLA_holo_1": "aLA holo 1",  # group display names keyed by folder prefix
-    "BSA_1":      "BSA 1",
-    "BSA_2":      "BSA 2",
-    "BSA_3":      "BSA 3",
-    "aLA_apo_1":  "aLA apo 1",
-    "aLA_holo_2": "aLA holo 2",
+    "aLA_holo": "aLA holo",  # group display names keyed by folder prefix
+    "BSA":      "BSA",
+    "aLA_apo":  "aLA apo",
 }
 
 COLORS = {
-    "aLA_holo_1": "#e6194b",  # red
-    "BSA_1":      "#3cb44b",  # green
-    "BSA_2":      "#4363d8",  # blue
-    "BSA_3":      "#f58231",  # orange
-    "aLA_apo_1":  "#911eb4",  # purple
-    "aLA_holo_2": "#42d4f4",  # cyan
+    "aLA_holo": "#e6194b",  # red
+    "BSA":      "#3cb44b",  # green
+    "aLA_apo":  "#911eb4",  # purple
 }
 
 OUTPUT_DIR = Path("histograms")  # directory to save the output HTML files
