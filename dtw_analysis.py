@@ -1,3 +1,15 @@
+"""
+DTW Analysis on Trimmed Events
+--------------------------------
+Loads trimmed event traces from an HDF5 file, subtracts the per-event
+baseline and normalises amplitude so the peak dip = -1, then DTW-aligns
+all events to a chosen reference event. Plots the aligned traces as an
+overlay together with the mean trace, rolling std, and the reference event.
+
+Requirements:
+    pip install h5py numpy pandas dtaidistance matplotlib
+"""
+
 import h5py
 import pandas as pd
 import numpy as np
