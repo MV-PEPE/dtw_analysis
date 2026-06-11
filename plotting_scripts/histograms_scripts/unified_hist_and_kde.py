@@ -26,8 +26,8 @@ from scipy.interpolate import make_interp_spline  # for spline through bar tops
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 DATA_DIRS = [
-    Path("data/data_for_plots/data_with_real_current"),       # directory with real current data
-    Path("data/data_for_plots/data_with_recovered_current"),  # directory with recovered current data
+    Path("modified_csvs/data_with_real_current"),       # directory with real current data
+    Path("modified_csvs/data_with_recovered_current"),  # directory with recovered current data
 ]
 
 COMPARISON_GROUPS = ["aLA_holo", "aLA_apo", "BSA"]  # groups to show in comparison row
