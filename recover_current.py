@@ -50,6 +50,7 @@ for h5_path in INPUT_DIR.rglob("*.h5"):                                    # rec
         csv = pd.read_csv(csv_path)                          # load the CSV file
         csv["area_nA_ms"]  = csv["area_nA_ms"]  * 2         # recover real current: correct area column
         csv["delta_I_nA"]  = csv["delta_I_nA"]  * 2         # recover real current: correct delta_I column
+        csv["resistance_MOhm"] = csv["resistance_MOhm"] / 2 # recover real resistance: correct resistance_MOhm column
         csv.to_csv(out_csv, index=False)                     # save corrected CSV to output folder
         print(f"Saved corrected CSV → {out_csv}")            # confirm CSV was saved
 
