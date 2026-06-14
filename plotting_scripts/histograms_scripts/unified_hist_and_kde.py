@@ -235,7 +235,7 @@ fig.update_layout(
     height=300 * n_rows,                                     # scale height to number of rows
     width=400 * n_cols,                                      # scale width to number of columns
     barmode="overlay",                                       # overlay bars if needed
-    legend_title="Comparison groups",                        # legend title
+    showlegend=False,                                        # hide the legend entirely
     margin=dict(l=120, r=20, t=60, b=40),                    # more left margin for labels
 )
 
