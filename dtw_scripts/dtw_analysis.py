@@ -41,13 +41,7 @@ with h5py.File(H5_PATH, "r") as f:
 # ── 2. Load metadata ───────────────────────────────────────────────────────────
 meta = pd.read_csv(CSV_PATH).set_index("event_name")
 
-# ── 3. Normalize to baseline ───────────────────────────────────────────────────
-# def normalize_to_baseline(signal, baseline_frac=0.1):
-#     n = max(1, int(len(signal) * baseline_frac))
-#     baseline = signal[:n].mean()
-#     return signal - baseline
-
-# ── 4. Pick reference event ─────────────────────────────────────────────────────
+# ── 3. Pick reference event ─────────────────────────────────────────────────────
 common_keys = [k for k in signals if k in meta.index]
 # ref_key      = "event_00176"
 mean_dwell = meta.loc[common_keys, "dwell_time_ms"].mean()
@@ -63,7 +57,7 @@ print(f"Reference: {ref_key}, dwell_time_ms: {ref_dwell:.2f}")
 
 print(f"Reference: {ref_key} ({ref_dwell:.1f} ms) — aligning {len(common_keys)} events...")
 
-# ── 5. DTW-align all events ────────────────────────────────────────────────────
+# ── 4. DTW-align all events ────────────────────────────────────────────────────
 aligned = []
 # print(meta.loc[common_keys, "delta_I_baseline_nA"].describe())
 print(meta.loc[common_keys, "dwell_time_ms"].describe())
@@ -81,16 +75,16 @@ for i, key in enumerate(common_keys):
 
 aligned = np.array(aligned)
 
-# ── 6. Shift time so deepest peak = t=0 ───────────────────────────────────────
+# ── 5. Shift time so deepest peak = t=0 ───────────────────────────────────────
 ref_peak_idx = np.argmin(ref_signal)
 ref_peak_ms  = ref_time[ref_peak_idx]
 time_aligned = ref_time - ref_peak_ms
 
-# ── 7. Mean and rolling std ────────────────────────────────────────────────────
+# ── 6. Mean and rolling std ────────────────────────────────────────────────────
 mean_trace  = aligned.mean(axis=0)
 rolling_std = pd.Series(mean_trace).rolling(window=20, center=True).std().values
 
-# ── 8. Plot ────────────────────────────────────────────────────────────────────
+# ── 7. Plot ────────────────────────────────────────────────────────────────────
 fig, ax = plt.subplots(figsize=(12, 6))
 
 for trace in aligned:
