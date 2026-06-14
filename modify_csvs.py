@@ -23,8 +23,8 @@ import ruptures as rpt         # for change-point detection (step counting)
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 DATA_DIRS = [
-    Path("./data/data_for_plots/data_with_real_current/aLA_holo_1_1"),       # directory with real current data
-    # Path("./data/data_for_plots/data_with_recovered_current"),  # directory with recovered current data
+    Path("./data/data_for_plots/data_with_real_current"),       # directory with real current data
+    Path("./data/data_for_plots/data_with_recovered_current"),  # directory with recovered current data
 ]
 
 OUTPUT_DIR = Path("modified_csvs")  # directory to save updated CSVs
