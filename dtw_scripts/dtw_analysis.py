@@ -101,3 +101,21 @@ plt.tight_layout()
 plt.savefig("dtw_plots/dtw_aligned_overlay.png", dpi=150)
 plt.show()
 print("Saved: dtw_plots/dtw_aligned_overlay.png")
+
+# ── 9. Plot raw baseline-subtracted overlay (no DTW alignment) ────────────────
+fig2, ax2 = plt.subplots(figsize=(12, 6))
+
+for key in common_keys:                                              # loop over every event
+    raw_signal = signals[key] - meta.at[key, "baseline_nA"]          # baseline-subtract only, no normalisation
+    trace_ms   = (meta.at[key, "end"] - meta.at[key, "start"]) / SAMPLING_RATE_KHZ  # total trace length in ms
+    time_axis  = np.linspace(0, trace_ms, DOWNSAMPLE_TO)              # this event's own time axis
+
+    ax2.plot(time_axis, raw_signal, color="steelblue", alpha=0.15, linewidth=0.5)  # plot individual trace
+
+ax2.set_xlabel("Time (ms)")                                           # x-axis label
+ax2.set_ylabel("Baseline-subtracted current (nA)")                    # y-axis label
+ax2.set_title("Raw Event Overlays (baseline-subtracted, no alignment)")  # plot title
+plt.tight_layout()                                                    # prevent labels from being clipped
+plt.savefig("dtw_plots/raw_baseline_overlay.png", dpi=150)           # save figure
+plt.show()                                                            # display figure
+print("Saved: dtw_plots/raw_baseline_overlay.png")                    # confirm saved
