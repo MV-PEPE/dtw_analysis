@@ -18,17 +18,20 @@ import h5py                    # for reading HDF5 files
 import numpy as np             # for numerical array operations
 import pandas as pd            # for loading and saving CSV metadata
 from pathlib import Path       # for navigating the folder structure
+import ruptures as rpt         # for change-point detection (step counting)
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 DATA_DIRS = [
-    Path("./data/data_for_plots/data_with_real_current"),       # directory with real current data
-    Path("./data/data_for_plots/data_with_recovered_current"),  # directory with recovered current data
+    Path("./data/data_for_plots/data_with_real_current/aLA_holo_1_1"),       # directory with real current data
+    # Path("./data/data_for_plots/data_with_recovered_current"),  # directory with recovered current data
 ]
 
-OUTPUT_DIR        = Path("modified_csvs")  # directory to save updated CSVs
-HDF5_GROUP        = "events"              # HDF5 group containing the event datasets
-SAMPLING_RATE_KHZ = 50                    # sampling rate in kHz (50 samples per ms)
+OUTPUT_DIR = Path("modified_csvs")  # directory to save updated CSVs
+HDF5_GROUP = "events"               # HDF5 group containing the event datasets
+
+SAMPLING_RATE_KHZ = 50              # sampling rate in kHz (50 samples per ms)
+PELT_PENALTY = 0.05                    # penalty for ruptures Pelt algorithm; higher = fewer detected steps
 
 # ── Helper functions ───────────────────────────────────────────────────────────
 
@@ -36,6 +39,13 @@ def compute_baseline(region: np.ndarray) -> float:
     """Compute baseline as mean of region, skipping first 20% to avoid transients."""
     skip = max(1, len(region) // 5)      # skip first ~20% of region
     return region[skip:].mean()          # mean of remaining samples
+
+def count_steps(trace, penalty):
+    """Count the number of steps (change points) in a trace using ruptures Pelt."""
+    algo         = rpt.Pelt(model="l2").fit(trace)         # fit Pelt with an L2 cost model (detects mean shifts)
+    breakpoints  = algo.predict(pen=penalty)               # find change points for the given penalty
+    n_steps      = len(breakpoints) - 1                    # last breakpoint is always the trace length, so subtract 1
+    return max(0, n_steps)                                 # ensure non-negative
 
 # ── Process all folders ────────────────────────────────────────────────────────
 
@@ -81,9 +91,16 @@ for data_dir in DATA_DIRS:                                    # loop over both d
                 dI_max = event_trace.max()                    # maximum current deviation from baseline
                 dI_min = event_trace.min()                    # minimum current deviation from baseline
 
+                dwell_samples  = end - start                               # event length in samples
+                post_buffer    = int(round(dwell_samples / 3))             # post-event buffer based on dwell time
+                step_end       = min(end + post_buffer, len(trace))        # end of step-counting region, clamped to trace length
+                step_region    = trace[start:step_end]                     # region to run step detection on
+                n_steps        = count_steps(step_region, PELT_PENALTY)    # count steps in this region
+
                 meta.at[event_name, "post_event_baseline_nA"] = post_baseline  # save post-event baseline
                 meta.at[event_name, "dI_nA_max"]              = dI_max         # save max current deviation
                 meta.at[event_name, "dI_nA_min"]              = dI_min         # save min current deviation
+                meta.at[event_name, "n_steps"]                = n_steps        # save step count to metadata
 
         # mirror the subfolder structure in the output directory
         rel_path   = csv_path.relative_to(data_dir.parent)   # path relative to data_for_plots
