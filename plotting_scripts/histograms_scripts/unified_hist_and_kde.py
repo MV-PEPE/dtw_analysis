@@ -117,17 +117,10 @@ n_rows     = len(group_list) + 1                          # one row per group + 
 n_cols     = len(VARIABLES)                               # one column per variable
 row_titles = [GROUPS[p] for p in group_list] + ["Comparison"]  # row label for each row
 
-# build subplot titles: variable names on first row only
-subplot_titles = []
-for row_idx in range(n_rows):                             # loop over rows
-    for col_idx, (_, x_label) in enumerate(VARIABLES):   # loop over columns
-        subplot_titles.append(x_label if row_idx == 0 else "")  # only label first row
-
 fig = make_subplots(
-    rows=n_rows, cols=n_cols,                             # grid dimensions
-    subplot_titles=subplot_titles,                        # variable names as column headers
-    horizontal_spacing=0.08,                              # spacing between columns
-    vertical_spacing=0.10,                                # spacing between rows
+    rows=n_rows, cols=n_cols,
+    horizontal_spacing=0.08,
+    vertical_spacing=0.10,
 )
 
 # ── Fill group rows (bars + spline) ───────────────────────────────────────────
