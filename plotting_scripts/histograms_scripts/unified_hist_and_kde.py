@@ -162,9 +162,8 @@ for row_idx, prefix in enumerate(group_list):             # loop over group rows
         data_max = np.percentile(data, X_CUTOFF_PERCENTILE) * 1.05         # cut off top outliers using percentile
         data_min = data.min() - (data.max() - data.min()) * 0.02            # small padding on the left
         fig.update_xaxes(range=[data_min, data_max], title_text=x_label,
-                 title_font=dict(size=13), row=row_idx + 1, col=col_idx + 1)
-        fig.update_yaxes(title_text="Count" if col_idx == 0 else "",
-                         row=row_idx + 1, col=col_idx + 1)  # count label on first column only
+                         title_font=dict(size=18), row=row_idx + 1, col=col_idx + 1)
+        fig.update_yaxes(title_text="Count", title_font=dict(size=18),row=row_idx + 1, col=col_idx + 1)
 
 # ── Fill comparison row (KDE density curves) ──────────────────────────────────
 
@@ -197,9 +196,8 @@ for col_idx, (col_name, x_label) in enumerate(VARIABLES):  # loop over columns
         )
 
     fig.update_xaxes(range=x_range, title_text=x_label,
-                     title_font=dict(size=13), row=n_rows, col=col_idx + 1)  # x range and label
-    fig.update_yaxes(title_text="Density" if col_idx == 0 else "",
-                     row=n_rows, col=col_idx + 1)            # density label on first column only
+                     title_font=dict(size=18), row=n_rows, col=col_idx + 1)  # x range and label
+    fig.update_yaxes(title_text="Density", title_font=dict(size=18), row=n_rows, col=col_idx + 1)
 
 # ── Add row labels on the left side ───────────────────────────────────────────
 
@@ -217,7 +215,7 @@ for row_idx, row_title in enumerate(row_titles):
         y=0.5,                                                      # always centred within the subplot domain
         showarrow=False,
         textangle=-90,
-        font=dict(size=15, color="black"),
+        font=dict(size=20, color="black"),
         xanchor="center",
         yanchor="middle",
     )
