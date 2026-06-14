@@ -76,7 +76,7 @@ for data_dir in DATA_DIRS:                                    # loop over both d
                     post_baseline = np.nan                    # set to NaN if no post-event buffer
 
                 # event region relative to pre-event baseline
-                event_trace   = trace[start:end] - pre_baseline  # subtract pre-event baseline from event
+                event_trace   = pre_baseline - trace[start:end]  # subtract pre-event baseline from event
 
                 dI_max = event_trace.max()                    # maximum current deviation from baseline
                 dI_min = event_trace.min()                    # minimum current deviation from baseline
